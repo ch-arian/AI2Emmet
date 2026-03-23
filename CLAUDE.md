@@ -12,8 +12,6 @@ emmet-ui is a React library that renders UI from LLM-generated Emmet abbreviatio
 - `npm test` — Run full vitest suite
 - `npx vitest src/path/to/file.test.tsx` — Run a single test file
 - `npm run test:watch` — Watch mode
-- `npm run storybook` — Storybook dev server on port 6006
-- `npm run build-storybook` — Build static Storybook
 
 ## Architecture
 
@@ -50,6 +48,5 @@ Located in `src/components/`. All use `tailwind-merge` for className merging. Bu
 - **Branded types**: Pipeline stages use branded string types (`EmmetString`, `HTMLString`, `SafeHTMLString`) — cast with `as EmmetString` etc.
 - **Tests co-located**: Test files live alongside source (e.g., `Button.test.tsx` next to `Button.tsx`)
 - **Stories co-located**: Storybook stories sit alongside components; demos live in `src/demos/`
-- **Storybook uses Tailwind CDN**: `.storybook/preview-head.html` loads the Tailwind CDN script so utility classes render in stories
 - **Vitest globals**: `describe`, `it`, `expect` etc. are globally available (no imports needed)
 - **jsdom environment**: Tests run in jsdom with `@testing-library/jest-dom` matchers
