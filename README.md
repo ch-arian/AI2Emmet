@@ -256,6 +256,14 @@ EmmetRenderer provides built-in error handling:
 
 Errors display a user-friendly message with retry button in development.
 
+## Security Hardening Notes
+
+`emmet-ui` sanitizes generated HTML with DOMPurify, but host applications should also configure
+**Content Security Policy (CSP)** for defense in depth.
+
+- Recommended: configure CSP via **HTTP response headers** in your app/server.
+- Runtime hint: `emmet-ui` logs a console warning once if no CSP meta tag is detected in browser DOM.
+
 ## License
 
 MIT
