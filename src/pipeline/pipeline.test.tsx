@@ -206,6 +206,17 @@ describe('pipeline', () => {
       // This test mainly verifies error handling propagates from expandEmmet
       expect(() => pipeline('div>>>')).toThrow();
     });
+
+    it('handles very large Emmet inputs', () => {
+      const large = `ul>${Array.from({ length: 300 }, (_, i) => `li{Item ${i + 1}}`).join('+')}`;
+      const result = pipeline(large);
+
+      const { container } = render(<>{result}</>);
+      const items = container.querySelectorAll('li');
+      expect(items.length).toBe(300);
+      expect(items[0]).toHaveTextContent('Item 1');
+      expect(items[299]).toHaveTextContent('Item 300');
+    });
   });
 
   describe('data attributes for action system', () => {

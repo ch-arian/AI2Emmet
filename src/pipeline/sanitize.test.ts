@@ -87,6 +87,41 @@ describe('sanitizeHTML', () => {
       expect(output).toBe('');
       expect(output).not.toContain('iframe');
     });
+
+    it('should remove data: protocol from links', () => {
+      const input = '<a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">Link</a>';
+      const output = sanitizeHTML(input);
+      expect(output.toLowerCase()).not.toContain('data:text/html');
+      expect(output).toContain('Link');
+    });
+
+    it('should remove vbscript: protocol from links', () => {
+      const input = '<a href="vbscript:msgbox(1)">Link</a>';
+      const output = sanitizeHTML(input);
+      expect(output.toLowerCase()).not.toContain('vbscript:');
+      expect(output).toContain('Link');
+    });
+
+    it('should remove encoded/whitespace javascript: protocol variants', () => {
+      const inputs = [
+        '<a href="  javascript:alert(1)">X</a>',
+        '<a href="&#106;avascript:alert(1)">X</a>',
+        '<a href="&#x6a;avascript:alert(1)">X</a>',
+      ];
+
+      inputs.forEach((input) => {
+        const output = sanitizeHTML(input);
+        expect(output.toLowerCase()).not.toContain('javascript:');
+      });
+    });
+
+    it('should remove svg and mathml tags (not in allowlist)', () => {
+      const input = '<svg onload="alert(1)"><circle /></svg><math><mi>x</mi></math>';
+      const output = sanitizeHTML(input);
+      expect(output.toLowerCase()).not.toContain('svg');
+      expect(output.toLowerCase()).not.toContain('math');
+      expect(output.toLowerCase()).not.toContain('onload');
+    });
   });
 
   describe('data-attribute handling', () => {
@@ -170,6 +205,13 @@ describe('sanitizeHTML', () => {
       expect(output).not.toContain('style');
       expect(output).not.toContain('title');
       expect(output).toBe('<div>X</div>');
+    });
+
+    it('should remove srcset attribute from images', () => {
+      const input = '<img src="/a.jpg" srcset="/a.jpg 1x, /b.jpg 2x" alt="A">';
+      const output = sanitizeHTML(input);
+      expect(output).toContain('src="/a.jpg"');
+      expect(output).not.toContain('srcset');
     });
   });
 

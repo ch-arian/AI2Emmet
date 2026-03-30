@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentType, ReactNode } from 'react';
 import { EmmetRenderer } from './EmmetRenderer';
+import { ComponentRegistry } from '../../registry/ComponentRegistry';
 
 describe('EmmetRenderer', () => {
   it('renders parsed emmet string', () => {
@@ -92,5 +94,19 @@ describe('EmmetRenderer', () => {
     expect(onError).toHaveBeenCalledTimes(1);
     const error = onError.mock.calls[0][0];
     expect(error).toBeInstanceOf(Error);
+  });
+
+  it('strips non-allowlisted custom tags before registry mapping', () => {
+    const Alert = ({ children }: { children?: ReactNode }) => (
+      <section data-testid="custom-alert">{children}</section>
+    );
+    const registry = new ComponentRegistry();
+    registry.register('alert', Alert as ComponentType<any>);
+
+    render(<EmmetRenderer emmet="alert{Heads up}" registry={registry} />);
+
+    // Sanitizer removes non-allowlisted tags, so the custom component is never invoked.
+    expect(screen.queryByTestId('custom-alert')).not.toBeInTheDocument();
+    expect(screen.getByText('Heads up')).toBeInTheDocument();
   });
 });
