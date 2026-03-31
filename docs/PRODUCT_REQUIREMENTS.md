@@ -336,3 +336,36 @@ Without a structured rendering pipeline, teams risk:
 4. Add optional strict mode to reject unknown tags early.
 5. Add cookbook examples for common LLM app interaction loops.
 
+
+---
+
+## Appendix A) PRD Coverage Audit (Edge Cases & Test Suite Relevance)
+
+This appendix consolidates the prior `docs/prd.md` audit into the main requirements document.
+
+### Coverage Summary (Updated)
+
+| Area | PRD Requirement | Coverage Status | Notes |
+|---|---|---|---|
+| Emmet expansion | FR-1 | Covered | Includes invalid/empty inputs and large input stress case. |
+| Sanitization | FR-2 / NFR-1 | Covered (strong) | Includes protocol bypass and disallowed tag/attribute edge cases. |
+| Hydration | FR-3 | Covered | Multiple roots, text nodes, nested nodes, custom replace covered. |
+| Registry mapping | FR-4 / NFR-4 | Covered (with caveat) | Registry works in replace layer; sanitizer allowlist limits custom tag pass-through in full pipeline. |
+| Action system | FR-5 | Covered | Includes delegation, bubbling, payload parsing, keyboard non-click guard, sibling isolation. |
+| Public APIs | FR-6 / FR-7 | Covered | Includes package export smoke tests and renderer/hook coverage. |
+
+### Remaining Gaps / Future Hardening
+
+1. **CSP policy quality validation** is not enforced by library runtime (only presence warning).
+2. **HTTP header-level checks** are not possible inside this UI library (host app responsibility).
+3. **Accessibility-triggered interaction semantics** (e.g., keyboard activation that results in click in real browsers) can be expanded with higher-fidelity integration tests.
+
+### Consolidation Opportunities (Optional)
+
+1. Several sanitizer tests are intentionally repetitive for security regression confidence; can be table-driven later.
+2. Some registry and renderer assertions can be merged to reduce duplication if test runtime becomes a concern.
+
+### Conclusion
+
+- **The previously identified high-priority edge cases are now covered by tests.**
+- **Primary remaining work is host-app hardening (CSP headers/policy strictness), beyond this library’s runtime scope.**
