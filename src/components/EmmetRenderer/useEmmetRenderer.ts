@@ -1,6 +1,7 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { pipeline } from '../../pipeline';
 import { useActionHandler } from '../../actions/useActionHandler';
+import { warnIfMissingCSP } from '../../security/csp';
 import type { ActionHandler } from '../../types/actions';
 import type { UseEmmetRendererOptions, UseEmmetRendererResult } from './types';
 
@@ -44,6 +45,11 @@ export function useEmmetRenderer(
 
   // Wire up action handler
   useActionHandler(containerRef, stableOnAction);
+
+  // Security: warn once if host app appears to be missing CSP.
+  useEffect(() => {
+    warnIfMissingCSP();
+  }, []);
 
   // Memoize pipeline execution (expensive operation)
   const element = useMemo(() => {

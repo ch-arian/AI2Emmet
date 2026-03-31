@@ -175,4 +175,36 @@ describe('useActionHandler', () => {
     expect(secondHandler).toHaveBeenCalledOnce(); // New handler called
     expect(callCount).toBe(2);
   });
+
+  it('does not trigger onAction for keyboard events without click', () => {
+    const onAction = vi.fn();
+    const { container } = render(
+      <TestContainer onAction={onAction}>
+        <button data-action="submit">Submit</button>
+      </TestContainer>
+    );
+
+    const button = container.querySelector('[data-action="submit"]') as HTMLButtonElement;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+    expect(onAction).not.toHaveBeenCalled();
+  });
+
+  it('clicking one action branch does not trigger sibling branch actions', () => {
+    const onAction = vi.fn();
+    const { container } = render(
+      <TestContainer onAction={onAction}>
+        <div>
+          <button data-action="left">Left</button>
+          <button data-action="right">Right</button>
+        </div>
+      </TestContainer>
+    );
+
+    const left = container.querySelector('[data-action="left"]') as HTMLButtonElement;
+    left.click();
+
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(onAction).toHaveBeenCalledWith('left', undefined, expect.any(MouseEvent));
+  });
 });
